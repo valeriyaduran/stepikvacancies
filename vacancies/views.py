@@ -39,7 +39,6 @@ class VacancyTypeView(View):
         context = {
             'vacancies_by_specialty': vacancies_by_specialty,
         }
-        print(vacancies_by_specialty)
         return render(request, 'vacancies/vacancy-type.html', context=context)
 
 
