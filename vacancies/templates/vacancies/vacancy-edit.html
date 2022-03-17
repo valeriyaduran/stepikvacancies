@@ -1,12 +1,24 @@
 {% extends 'vacancies/base.html' %}
 {% block content %}
 
-{% load crispy_forms_tags %}
-{% crispy form %}
+<div class="col-12 col-lg-8">
+    <div class="card">
+        <div class="card-body px-4 pb-4 tab-content">
+            <div class="text-center mt-3 b-1">
+                <h1 class="h3 mb-3 font-weight-normal">Добавление вакансии</h1>
+            </div>
 
+            {% load crispy_forms_tags %}
+            {% crispy form %}
 
-<h2 class="h4 pt-2 pb-3">Отклики - {{ applications.count }}</h2>
+        </div>
+    </div>
+</div>
+
 <!-- Application 1 -->
+{% if applications.count > 0 %}
+<h2 class="h4 pt-2 pb-3">Отклики - {{ applications.count }}</h2>
+{% endif %}
 {% for application in applications %}
 <div class="card mt-3">
     <div class="card-body px-4">

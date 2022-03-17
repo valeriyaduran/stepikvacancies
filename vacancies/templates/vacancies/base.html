@@ -27,10 +27,17 @@
             <ul class="navbar-nav col-2 justify-content-end">
                 <li class="nav-item active">
                     <div class="btn-group">
+                        {% if user.first_name or user.last_name %}
                         <button type="button" class="btn dropdown-toggle font-weight-bold  float-right"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ user.first_name }} {{ user.last_name }}
                         </button>
+                        {% else %}
+                        <button type="button" class="btn dropdown-toggle font-weight-bold  float-right"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ user.username }}
+                        </button>
+                        {% endif %}
                         <div class="dropdown-menu dropdown-menu-right mt-3">
                             <a href="#" class="dropdown-item py-2">Профиль</a>
                             <a href="#" class="dropdown-item py-2">Резюме</a>

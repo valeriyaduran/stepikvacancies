@@ -15,7 +15,7 @@ class SendApplicationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Отозваться на вакансию'))
+        self.helper.add_input(Submit('submit', 'Отозваться на вакансию')),
 
 
 class UserRegisterForm(UserCreationForm):
@@ -34,7 +34,7 @@ class UserRegisterForm(UserCreationForm):
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label='Логин')
-    password = forms.CharField(label='Пароль')
+    # password = forms.CharField(label='Пароль')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,12 +62,12 @@ class MyCompanyForm(forms.ModelForm):
 
 
 class MyVacancyForm(forms.ModelForm):
-    title = forms.CharField(label='Название вакансии')
-    # specialty = forms.CharField(label='Специализация')
-    skills = forms.CharField(label='Требуемые навыки', widget=forms.Textarea())
-    salary_min = forms.IntegerField(label='Зарплата от')
-    salary_max = forms.IntegerField(label='Зарплата до')
-    description = forms.CharField(label='Описание вакансии', widget=forms.Textarea())
+    # title = forms.CharField(label='Название вакансии')
+    # # specialty = forms.CharField(label='Специализация')
+    # skills = forms.CharField(label='Требуемые навыки', widget=forms.Textarea())
+    # salary_min = forms.IntegerField(label='Зарплата от')
+    # salary_max = forms.IntegerField(label='Зарплата до')
+    # description = forms.CharField(label='Описание вакансии', widget=forms.Textarea())
 
     class Meta:
         model = Vacancy

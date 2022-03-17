@@ -41,13 +41,14 @@ class Specialty(models.Model):
 
 
 class Vacancy(models.Model):
-    title = models.CharField(max_length=64)
-    specialty = models.ForeignKey(Specialty, on_delete=models.PROTECT, related_name="vacancies")
+    title = models.CharField(max_length=64, verbose_name='Название вакансии')
+    specialty = models.ForeignKey(Specialty, on_delete=models.PROTECT, related_name="vacancies",
+                                  verbose_name='Специализация')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="vacancies")
-    skills = models.TextField(blank=True)
-    description = models.TextField(blank=True)
-    salary_min = models.IntegerField(blank=True)
-    salary_max = models.IntegerField(blank=True)
+    skills = models.TextField(blank=True, verbose_name='Требуемые навыки')
+    description = models.TextField(blank=True, verbose_name='Описание вакансии')
+    salary_min = models.IntegerField(blank=True, verbose_name='Зарплата от')
+    salary_max = models.IntegerField(blank=True, verbose_name='Зарплата до')
     published_at = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
