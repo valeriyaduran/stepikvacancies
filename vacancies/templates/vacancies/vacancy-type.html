@@ -2,7 +2,7 @@
 {% load static %}
 {% load salary %}
 
-    {% block vacancies %}
+    {% block content %}
     {% if vacancies_by_specialty.all.count > 0 %}
     <h1 class="h1 text-center mx-auto mt-4 pt-5" style="font-size: 50px;"><strong>{{ vacancies_by_specialty.0.specialty.title }}</strong></h1>
     <p class="text-center pt-1">Найдено {{ vacancies_by_specialty.all.count }} вакансий</p>
@@ -23,7 +23,9 @@
                   <p class="text-muted pt-1">{{ vacancy.published_at|date:"d M" }}</p>
                 </div>
                 <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
-                  <a href="{{ vacancy.company.get_absolute_url }}"><img src="{% static 'vacancies/images/companies_logo/'|add:vacancy.company.name|add:'.png' %}" width="130" height="80" alt=""></a>
+                    {% if vacancy.company.logo %}
+                  <a href="{{ vacancy.company.get_absolute_url }}"><img src="{{ vacancy.company.logo.url }}" width="130" height="80" alt=""></a>
+                    {% endif %}
                 </div>
               </div>
             </div>

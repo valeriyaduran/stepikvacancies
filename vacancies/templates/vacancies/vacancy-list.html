@@ -1,0 +1,53 @@
+{% extends 'vacancies/my-company-base.html' %}
+
+{% block mycompany %}
+<div class="col-12 col-lg-8">
+    <div class="card">
+        <div class="card-body px-4 pb-4">
+            <section class="tab-pane fade show active">
+                <h2 class="h4 pt-2 pb-3">Вакансии</h2>
+                {% if not mycompany %}
+                <h6>У вас нет компании, поэтому вы не можете создать вакансию. Для создания вернитесь на вкладку
+                    'Информация о компании'</h6>
+                {% elif vacancies.count == 0 %}
+                <h6>У вас пока нет вакансии, но вы можете создать первую!</h6>
+                <a href="{% url 'mycompany_create_vacancy' %}" class="btn btn-outline-info">Добавить вакансию</a>
+                {% else %}
+                {% for vacancy in vacancies %}
+                <!-- vacancy state 1 -->
+                <div class="card mt-3">
+                    <div class="card-body px-4">
+                        <div class="row align-items-center">
+                            <div class="col-6 col-lg-8">
+                                <a href="{% url 'mycompany_vacancy' vacancy.pk %}" class="mb-1">{{ vacancy.title }}</a>
+                                {% if vacancy.applications.count == 0 %}
+                                <p class="mb-1">
+                                    <span class="mr-4">{{ vacancy.salary_max }}</span><span class="text-info">
+                                    Нет откликов</span>
+                                </p>
+                                {% else %}
+                                <p class="mb-1">
+                                    <span class="mr-4">{{ vacancy.salary_max }}</span><a
+                                        href="{% url 'mycompany_vacancy' vacancy.pk %}" class="text-info">
+                                    {{ vacancy.applications.count }} отклика</a>
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="col-6 col-lg-4 text-right">
+                                <a href="{% url 'mycompany_vacancy' vacancy.pk %}"
+                                   class="btn btn-outline-info">Изменить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END vacancy state 1 -->
+                {% endfor %}
+                <div class="card-body px-0">
+                    <a href="{% url 'mycompany_create_vacancy' %}" class="btn btn-outline-info">Добавить вакансию</a>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

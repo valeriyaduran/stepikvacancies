@@ -1,0 +1,10 @@
+{% extends 'vacancies/base.html' %}
+
+{% block content %}
+<p class="h5 font-weight-light"><b>{{ title }}</b></p>
+
+{% load crispy_forms_tags %}
+{% crispy form %}
+
+<div class="mt-4 text-center"><p>Есть аккаунт? <a href="{% url 'login' %}">Войдите!</a></p></div>
+{% endblock %}

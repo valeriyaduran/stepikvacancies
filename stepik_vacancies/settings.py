@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'vacancies.apps.VacanciesConfig',
+    'phonenumber_field',
+    'phonenumbers',
     'crispy_forms',
-
 ]
 
 MIDDLEWARE = [
@@ -122,9 +123,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = []
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = 'media'
+MEDIA_COMPANY_IMAGE_DIR = 'company_images'
+MEDIA_SPECIALITY_IMAGE_DIR = 'speciality_images'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+PHONENUMBER_DB_FORMAT = "INTERNATIONAL"
+PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"

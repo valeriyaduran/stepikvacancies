@@ -2,42 +2,48 @@
 {% load static %}
 {% load salary %}
 
- {% block company %}
-  <main class="container mt-3">
+{% block content %}
+<main class="container mt-3">
     <div class="navbar mt-5">
-      <p><a href="{% url 'home' %}">Назад</a></p>
+        <p><a href="{% url 'home' %}">Назад</a></p>
     </div>
     <section>
-      <div class="text-center">
-        <img src="{% static 'vacancies/images/companies_logo/'|add:company.0.name|add:'.png' %}" width="130" height="80" alt="">
-      </div>
-      <h1 class="h1 text-center mx-auto mt-0 pt-1" style="font-size: 70px;"><strong>{{ company.0.name }}</strong></h1>
-      <p class="text-center pt-1">Компания, {{ company.0.location }}, {{ company.0.vacancies.all.count }} вакансий</p>
-     {% if company.0.vacancies.all.count == 0 %}
-      <p class="text-center pt-1">У компании не найдено ни одной вакансии</p>
-      {% else %}
-      <div class="row mt-5">
-        <div class="col-12 col-lg-8 offset-lg-2 m-auto">
-          <div class="card mb-4">
-            <div class="card-body px-4">
-              <div class="row">
+        <div class="text-center">
+            {% if company.logo %}
+            <img src="{{ company.logo.url }}" width="130" height="80" alt="">
+            {% endif %}
+        </div>
+        <h1 class="h1 text-center mx-auto mt-0 pt-1" style="font-size: 70px;"><strong>{{ company.name }}</strong></h1>
+        <p class="text-center pt-1">Компания, {{ company.location }}, {{ company.vacancies.all.count }} вакансий</p>
+        {% if company.vacancies.all.count == 0 %}
+        <p class="text-center pt-1">У компании не найдено ни одной вакансии</p>
+        {% else %}
+        <div class="row mt-5">
+            <div class="col-12 col-lg-8 offset-lg-2 m-auto">
                 {% for vacancy in vacancies %}
-                <div class="col-12 col-md-8 col-lg-9">
-                  <h2 class="h2 pb-2"><a href="{{ vacancy.get_absolute_url }}">{{ vacancy.title }}</a></h2>
-                  <p class="mb-2">{{ vacancy.skills }}</p>
-                  <p>От {{ vacancy.salary_min|salary }} до {{ vacancy.salary_max|salary }} руб.</p>
-                  <p class="text-muted pt-1">{{ vacancy.published_at|date:"d M" }}</p>
+                <div class="card mb-4">
+                    <div class="card-body px-4">
+                        <div class="row">
+                            <div class="col-12 col-md-8 col-lg-9">
+
+                                <h2 class="h2 pb-2"><a href="{{ vacancy.get_absolute_url }}">{{ vacancy.title }}</a>
+                                </h2>
+                                <p class="mb-2">{{ vacancy.skills }}</p>
+                                <p>От {{ vacancy.salary_min|salary }} до {{ vacancy.salary_max|salary }} руб.</p>
+                                <p class="text-muted pt-1">{{ vacancy.published_at|date:"d M" }}</p>
+                            </div>
+                            <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
+                                {% if vacancy.specialty.picture %}
+                                <img src="{{ vacancy.specialty.picture.url }}" width="130" height="80" alt="">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-12 col-md-4 col-lg-3 d-flex align-items-end">
-                  <img src="{% static 'vacancies/images/specialties/'|add:vacancy.specialty.code|add:'.png' %}" width="130" height="80" alt="">
-                </div>
-              </div>
+                {% endfor %}
             </div>
-          </div>
-      {% endfor %}
-      {% endif %}
-      </div>
-      </div>
+        </div>
+        {% endif %}
     </section>
-  </main>
-  {% endblock %}
+</main>
+{% endblock %}
