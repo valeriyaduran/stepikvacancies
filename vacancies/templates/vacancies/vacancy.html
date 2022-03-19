@@ -28,8 +28,10 @@
                     <p>{{ vacancy.description|safe }}
                     </p>
                 </div>
+                {% if user.is_authenticated %}
                 {% load crispy_forms_tags %}
                 {% crispy form %}
+                {% endif %}
             </section>
         </div>
     </div>

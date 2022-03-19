@@ -13,3 +13,4 @@ pycodestyle==2.8.0
 pyflakes==2.4.0
 sqlparse==0.4.2
 unicode==2.8
+whitenoise==6.0.0
