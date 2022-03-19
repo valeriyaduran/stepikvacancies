@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('vacancies', '0006_alter_application_written_cover_letter_and_more'),
     ]
@@ -34,7 +33,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='vacancy',
             name='specialty',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='vacancies', to='vacancies.specialty', verbose_name='Специализация'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='vacancies',
+                                    to='vacancies.specialty', verbose_name='Специализация'),
         ),
         migrations.AlterField(
             model_name='vacancy',

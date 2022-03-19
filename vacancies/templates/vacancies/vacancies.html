@@ -6,7 +6,11 @@
 <section>
     {% for specialty in specialties %}
     <h1 class="h1 text-center mx-auto mt-4 pt-5" style="font-size: 50px;"><strong>{{ specialty.title }}</strong></h1>
+    {% if vacancies.all.count > 0 %}
     <p class="text-center pt-1">{{ specialty.vacancies.all.count }} вакансий</p>
+    {% else %}
+    <p class="text-center pt-1">По специализации не найдено ни одной вакансии</p>
+    {% endif %}
     {% for vacancy in vacancies %}
     {% if specialty.code == vacancy.specialty.code %}
     <div class="row mt-5">

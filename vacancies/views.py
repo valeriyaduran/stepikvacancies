@@ -27,12 +27,14 @@ class VacanciesView(ListView):
 
 class VacancyTypeView(ListView):
     model = Vacancy
-    template_name = 'vacancies/vacancy-type.html'
-    context_object_name = 'vacancies_by_specialty'
+    template_name = 'vacancies/vacancies.html'
 
-    def get_queryset(self):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         specialty = get_object_or_404(Specialty, code=self.kwargs['vacancy_type'])
-        return Vacancy.objects.filter(specialty=specialty)
+        context['specialties'] = [specialty]
+        context['vacancies'] = Vacancy.objects.filter(specialty=specialty)
+        return context
 
 
 class CompanyView(View):
@@ -118,7 +120,6 @@ class MyCompanyLetsStartView(TemplateView):
 class MyCompanyCreateView(CreateView):
     form_class = MyCompanyForm
     template_name = 'vacancies/company-edit.html'
-    # success_url = reverse_lazy('home')
 
     def get(self, request, *args, **kwargs):
 
@@ -148,7 +149,6 @@ class MyCompanyCreateView(CreateView):
 class MyCompanyFullView(UpdateView):
     form_class = MyCompanyForm
     template_name = 'vacancies/company-edit.html'
-    # success_url = reverse_lazy('home')
 
     def get(self, request, *args, **kwargs):
         try:
