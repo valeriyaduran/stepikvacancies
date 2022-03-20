@@ -1,5 +1,4 @@
-from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView
+from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 
-from vacancies.forms import SendApplicationForm, UserRegisterForm, UserLoginForm, MyCompanyForm, MyVacancyForm
+from vacancies.forms import SendApplicationForm, MyCompanyForm, MyVacancyForm
 from vacancies.models import Specialty, Vacancy, Company, Application
 
 
@@ -93,26 +92,6 @@ class SentView(TemplateView):
         return context
 
 
-class UserRegisterView(CreateView):
-    form_class = UserRegisterForm
-    template_name = 'vacancies/register.html'
-    success_url = reverse_lazy('login')
-
-
-class UserLoginView(LoginView):
-    form_class = UserLoginForm
-    template_name = 'vacancies/login.html'
-
-    def get_success_url(self):
-        return reverse_lazy('home')
-
-
-class UserLogoutView(View):
-    def get(self, request, *args, **kwargs):
-        logout(request)
-        return redirect('home')
-
-
 class MyCompanyLetsStartView(TemplateView):
     template_name = 'vacancies/company-create.html'
 
@@ -124,10 +103,10 @@ class MyCompanyCreateView(CreateView):
     def get(self, request, *args, **kwargs):
 
         context = {
-                'form': MyCompanyForm,
-                'isCompanyClick': "nav-link active",
-                'isVacancyClick': "nav-link"
-                }
+            'form': MyCompanyForm,
+            'isCompanyClick': "nav-link active",
+            'isVacancyClick': "nav-link"
+        }
         return render(request, 'vacancies/company-edit.html', context=context)
 
     def post(self, request, *args, **kwargs):
@@ -137,7 +116,8 @@ class MyCompanyCreateView(CreateView):
                 mycompany = mycompany_form.save(commit=False)
                 mycompany.owner = request.user
                 mycompany.save()
-                return redirect('home')
+                messages.success(self.request, 'Компания успешно создана!')
+                return redirect('mycompany')
         else:
             mycompany_form = MyCompanyForm()
         return render(request, 'vacancies/company-edit.html', context={'form': mycompany_form,
@@ -174,6 +154,7 @@ class MyCompanyFullView(UpdateView):
                 mycompany = mycompany_form.save(commit=False)
                 mycompany.owner = request.user
                 mycompany.save()
+                messages.success(self.request, 'Информация о компании успешно обновлена!')
                 return redirect('mycompany')
         else:
             mycompany_form = MyCompanyForm(instance=mycompany)
@@ -237,7 +218,7 @@ class MyCompanyVacancyFullView(UpdateView):
                 'applications': applications,
                 'myvacancy': myvacancy,
                 'form': filled_form,
-                    }
+            }
         return render(request, 'vacancies/vacancy-edit.html', context=context)
 
     def post(self, request, **kwargs):

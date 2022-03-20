@@ -1,5 +1,6 @@
 {% extends 'vacancies/my-company-base.html' %}
 {% block mycompany %}
+
 <div class="col-12 col-lg-8">
     <div class="card">
         <div class="card-body px-4 pb-4">
@@ -8,6 +9,13 @@
                 <h2 class="h4 pt-2 pb-3">Информация о&nbsp;компании</h2>
 
                 {% load crispy_forms_tags %}
+
+                {% for message in messages %}
+                <div class="alert alert-success col-lg-12 text-center mx-auto" role="alert">
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                </div>
+                {% endfor %}
+
                 {% crispy form %}
             </section>
             <!-- END Tab -->

@@ -19,9 +19,11 @@ from django.contrib import admin
 from django.urls import path
 
 from vacancies.views import MainView, VacanciesView, VacancyTypeView, CompanyView, VacancyView, custom_handler404, \
-    custom_handler500, SentView, UserRegisterView, UserLoginView, UserLogoutView, \
+    custom_handler500, SentView, \
     MyCompanyCreateView, MyCompanyFullView, MyCompanyVacanciesView, \
     MyCompanyLetsStartView, MyCompanyVacancyFullView, MyCompanyCreateVacancyView
+
+from accounts.views import UserRegisterView, UserLoginView, UserLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
