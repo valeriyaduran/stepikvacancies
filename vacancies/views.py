@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -22,6 +23,10 @@ class VacanciesView(ListView):
     template_name = 'vacancies/vacancies.html'
     context_object_name = 'vacancies'  # это по сути object_list, то есть все объекты из модели Vacancy
     extra_context = {'specialties': Specialty.objects.all()}
+
+    def get_queryset(self):
+        print(self.kwargs)
+        return Vacancy.objects.all()
 
 
 class VacancyTypeView(ListView):
@@ -126,9 +131,10 @@ class MyCompanyCreateView(CreateView):
                                                                        })
 
 
-class MyCompanyFullView(UpdateView):
+class MyCompanyFullView(LoginRequiredMixin, UpdateView):
     form_class = MyCompanyForm
     template_name = 'vacancies/company-edit.html'
+    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         try:
@@ -161,9 +167,10 @@ class MyCompanyFullView(UpdateView):
         return render(request, 'vacancies/company-edit.html', context={'form': mycompany_form})
 
 
-class MyCompanyVacanciesView(ListView):
+class MyCompanyVacanciesView(LoginRequiredMixin, ListView):
     model = Vacancy
     template_name = 'vacancies/vacancy-list.html'
+    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         vacancies_by_company = None
@@ -181,10 +188,11 @@ class MyCompanyVacanciesView(ListView):
         return render(request, 'vacancies/vacancy-list.html', context=context)
 
 
-class MyCompanyCreateVacancyView(CreateView):
+class MyCompanyCreateVacancyView(LoginRequiredMixin, CreateView):
     form_class = MyVacancyForm
     template_name = 'vacancies/vacancy-edit.html'
     success_url = reverse_lazy('home')
+    login_url = '/login/'
 
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
@@ -199,10 +207,11 @@ class MyCompanyCreateVacancyView(CreateView):
         return render(request, 'vacancies/vacancy-edit.html', context={'form': myvacancy_form})
 
 
-class MyCompanyVacancyFullView(UpdateView):
+class MyCompanyVacancyFullView(LoginRequiredMixin, UpdateView):
     form_class = MyVacancyForm
     template_name = 'vacancies/vacancy-edit.html'
     success_url = reverse_lazy('home')
+    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         mycompany = Company.objects.get(owner=request.user)
