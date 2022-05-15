@@ -33,7 +33,6 @@ class MyCompanyForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('save', 'Сохранить'))
-        self.helper
 
 
 class MyVacancyForm(forms.ModelForm):

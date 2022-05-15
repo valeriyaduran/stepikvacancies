@@ -3,8 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.views import View
+from django.urls import reverse_lazy, Resolver404
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 
 from vacancies.forms import SendApplicationForm, MyCompanyForm, MyVacancyForm
@@ -15,18 +14,22 @@ class MainView(ListView):
     model = Specialty
     template_name = 'vacancies/index.html'
     context_object_name = 'specialties'
-    extra_context = {'companies': Company.objects.all()}
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['companies'] = Company.objects.all()
+        return context
 
 
 class VacanciesView(ListView):
     model = Vacancy
     template_name = 'vacancies/vacancies.html'
     context_object_name = 'vacancies'  # это по сути object_list, то есть все объекты из модели Vacancy
-    extra_context = {'specialties': Specialty.objects.all()}
 
-    def get_queryset(self):
-        print(self.kwargs)
-        return Vacancy.objects.all()
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['specialties'] = Specialty.objects.all()
+        return context
 
 
 class VacancyTypeView(ListView):
@@ -34,46 +37,48 @@ class VacancyTypeView(ListView):
     template_name = 'vacancies/vacancies.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data()
         specialty = get_object_or_404(Specialty, code=self.kwargs['vacancy_type'])
         context['specialties'] = [specialty]
         context['vacancies'] = Vacancy.objects.filter(specialty=specialty)
         return context
 
 
-class CompanyView(View):
+class CompanyView(TemplateView):
     model = Company
+    template_name = 'vacancies/company.html'
 
-    def get(self, request, company_id, *args, **kwargs):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
         try:
-            company = Company.objects.get(pk=company_id)
+            company = Company.objects.get(pk=self.kwargs['company_id'])
         except ObjectDoesNotExist:
             raise Http404("Компании с таким id не существует")
         vacancies_by_company = Vacancy.objects.filter(company=company.id)
-        context = {
-            'company': company,
-            'vacancies': vacancies_by_company
-        }
-        return render(request, 'vacancies/company.html', context=context)
+        context['company'] = company
+        context['vacancies'] = vacancies_by_company
+        return context
 
 
-class VacancyView(View):
+class VacancyView(TemplateView):
     model = Vacancy
     template_name = 'vacancies/vacancy.html'
 
-    def get(self, request, vacancy_id, *args, **kwargs):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        try:
+            vacancy = Vacancy.objects.get(pk=self.kwargs['vacancy_id'])
+        except ObjectDoesNotExist:
+            raise Http404("Вакансии с таким id не существует")
+        context['vacancy'] = vacancy
+        context['form'] = SendApplicationForm
+        return context
+
+    def post(self, request, vacancy_id):
         try:
             vacancy = Vacancy.objects.get(pk=vacancy_id)
         except ObjectDoesNotExist:
             raise Http404("Вакансии с таким id не существует")
-        context = {
-            'vacancy': vacancy,
-            'form': SendApplicationForm
-        }
-        return render(request, 'vacancies/vacancy.html', context=context)
-
-    def post(self, request, vacancy_id):
-        vacancy = Vacancy.objects.get(pk=vacancy_id)
         if request.method == 'POST':
             send_application_form = SendApplicationForm(request.POST)
             if send_application_form.is_valid():
@@ -91,30 +96,35 @@ class VacancyView(View):
 class SentView(TemplateView):
     template_name = 'vacancies/sent.html'
 
-    def get_context_data(self, vacancy_id, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['vacancy_id'] = vacancy_id
+        context['vacancy_id'] = self.kwargs['vacancy_id']
         return context
 
 
-class MyCompanyLetsStartView(TemplateView):
+class MyCompanyLetsStartView(LoginRequiredMixin, TemplateView):
     template_name = 'vacancies/company-create.html'
+    login_url = '/login/'
 
 
-class MyCompanyCreateView(CreateView):
+class MyCompanyCreateView(LoginRequiredMixin, CreateView):
     form_class = MyCompanyForm
     template_name = 'vacancies/company-edit.html'
+    login_url = '/login/'
 
-    def get(self, request, *args, **kwargs):
-
+    def get_context_data(self, **kwargs):
         context = {
             'form': MyCompanyForm,
             'isCompanyClick': "nav-link active",
             'isVacancyClick': "nav-link"
         }
-        return render(request, 'vacancies/company-edit.html', context=context)
+        return context
 
     def post(self, request, *args, **kwargs):
+        try:
+            Company.objects.get(owner=request.user)
+        except ObjectDoesNotExist:
+            return redirect('letsstart_mycompany')
         if request.method == 'POST':
             mycompany_form = MyCompanyForm(request.POST, request.FILES)
             if mycompany_form.is_valid():
@@ -140,8 +150,6 @@ class MyCompanyFullView(LoginRequiredMixin, UpdateView):
         try:
             mycompany = Company.objects.get(owner=request.user)
         except ObjectDoesNotExist:
-            mycompany = None
-        if not mycompany:
             return redirect('letsstart_mycompany')
         else:
             filled_form = MyCompanyForm(instance=mycompany)
@@ -153,7 +161,10 @@ class MyCompanyFullView(LoginRequiredMixin, UpdateView):
             return render(request, 'vacancies/company-edit.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        mycompany = Company.objects.get(owner=request.user)
+        try:
+            mycompany = Company.objects.get(owner=request.user)
+        except ObjectDoesNotExist:
+            return redirect('letsstart_mycompany')
         if request.method == 'POST':
             mycompany_form = MyCompanyForm(request.POST, request.FILES, instance=mycompany)
             if mycompany_form.is_valid():
@@ -178,7 +189,7 @@ class MyCompanyVacanciesView(LoginRequiredMixin, ListView):
             mycompany = Company.objects.get(owner=request.user)
             vacancies_by_company = Vacancy.objects.filter(company=mycompany.pk)
         except ObjectDoesNotExist:
-            mycompany = None
+            return redirect('letsstart_mycompany')
         context = {
             'mycompany': mycompany,
             'vacancies': vacancies_by_company,
@@ -214,16 +225,21 @@ class MyCompanyVacancyFullView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
-        mycompany = Company.objects.get(owner=request.user)
-        vacancies_by_company = Vacancy.objects.filter(company=mycompany.pk)
-        myvacancy = get_object_or_404(Vacancy, pk=self.kwargs['vacancy_id'])
+        try:
+            Company.objects.get(owner=request.user)
+        except ObjectDoesNotExist:
+            return redirect('letsstart_mycompany')
+
+        myvacancy = get_object_or_404(
+            Vacancy.objects.filter(
+                company__owner_id=request.user.pk
+            ),
+            pk=self.kwargs['vacancy_id'],
+        )
         applications = Application.objects.filter(vacancy=self.kwargs['vacancy_id'])
 
-        if myvacancy not in vacancies_by_company:
-            raise Http404('У вашей компании нет вакансии с таким id')
-        else:
-            filled_form = MyVacancyForm(instance=myvacancy)
-            context = {
+        filled_form = MyVacancyForm(instance=myvacancy)
+        context = {
                 'applications': applications,
                 'myvacancy': myvacancy,
                 'form': filled_form,
@@ -231,7 +247,10 @@ class MyCompanyVacancyFullView(LoginRequiredMixin, UpdateView):
         return render(request, 'vacancies/vacancy-edit.html', context=context)
 
     def post(self, request, **kwargs):
-        myvacancy = Vacancy.objects.get(pk=self.kwargs['vacancy_id'])
+        try:
+            myvacancy = Vacancy.objects.get(pk=self.kwargs['vacancy_id'])
+        except ObjectDoesNotExist:
+            raise Http404('У вашей компании нет вакасии с таким id!')
         if request.method == 'POST':
             myvacancy_form = MyVacancyForm(request.POST, instance=myvacancy)
             if myvacancy_form.is_valid():
@@ -245,7 +264,10 @@ class MyCompanyVacancyFullView(LoginRequiredMixin, UpdateView):
 
 
 def custom_handler404(request, exception):
-    return HttpResponseNotFound(exception)
+    if isinstance(exception, Resolver404):
+        return HttpResponseNotFound("Запрашиваемая страница не найдена!")
+    else:
+        return HttpResponseNotFound(exception)
 
 
 def custom_handler500(request):

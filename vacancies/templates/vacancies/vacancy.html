@@ -18,7 +18,7 @@
                 {% endif %}
                 <div class="d-flex align-items-baseline align-content-baseline">
                     <h1 class="h2 mt-4 font-weight-bold">{{ vacancy.title }}</h1>
-                    <p class="m-0 pl-3">{{ vacancy.salary_min|salary }} – {{ vacancy.salary_max|salary }} Р</p>
+                    <p class="m-0 pl-3">{{ vacancy.salary_min|salary }} – {{ vacancy.salary_max|salary }} $</p>
                 </div>
                 <p class="mt-2">{{ vacancy.skills }}</p>
                 <p class="text-muted mb-4">{{ vacancy.company.name }} ({{ vacancy.company.employee_count }}
