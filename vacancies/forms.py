@@ -8,7 +8,7 @@ from .models import Application, Company, Vacancy
 class SendApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
-        fields = ['written_username', 'written_phone', 'written_cover_letter']
+        fields = ['written_username', 'written_phone', 'written_email', 'written_cover_letter']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

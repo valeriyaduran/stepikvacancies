@@ -8,6 +8,7 @@ from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 
 from vacancies.forms import SendApplicationForm, MyCompanyForm, MyVacancyForm
 from vacancies.models import Specialty, Vacancy, Company, Application
+from vacancies.signals.send_application_signal import application_signal
 
 
 class MainView(ListView):
@@ -86,6 +87,7 @@ class VacancyView(TemplateView):
                 application.user = request.user
                 application.vacancy = vacancy
                 application.save()
+                application_signal.send(sender=self.__class__)
                 return redirect('application_sent', self.kwargs['vacancy_id'])
         else:
             send_application_form = SendApplicationForm()
@@ -121,10 +123,6 @@ class MyCompanyCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        try:
-            Company.objects.get(owner=request.user)
-        except ObjectDoesNotExist:
-            return redirect('letsstart_mycompany')
         if request.method == 'POST':
             mycompany_form = MyCompanyForm(request.POST, request.FILES)
             if mycompany_form.is_valid():
@@ -155,6 +153,7 @@ class MyCompanyFullView(LoginRequiredMixin, UpdateView):
             filled_form = MyCompanyForm(instance=mycompany)
             context = {
                 'form': filled_form,
+                'mycompany': mycompany,
                 'isCompanyClick': "nav-link active",
                 'isVacancyClick': "nav-link"
             }
@@ -240,10 +239,10 @@ class MyCompanyVacancyFullView(LoginRequiredMixin, UpdateView):
 
         filled_form = MyVacancyForm(instance=myvacancy)
         context = {
-                'applications': applications,
-                'myvacancy': myvacancy,
-                'form': filled_form,
-            }
+            'applications': applications,
+            'myvacancy': myvacancy,
+            'form': filled_form,
+        }
         return render(request, 'vacancies/vacancy-edit.html', context=context)
 
     def post(self, request, **kwargs):

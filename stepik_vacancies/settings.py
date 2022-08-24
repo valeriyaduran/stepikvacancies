@@ -52,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'vacancies.middleware.calculate_request_time'
 ]
 
 ROOT_URLCONF = 'stepik_vacancies.urls'

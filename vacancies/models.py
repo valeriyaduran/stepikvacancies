@@ -65,6 +65,7 @@ class Vacancy(models.Model):
 class Application(models.Model):
     written_username = models.CharField(max_length=64, verbose_name='Вас зовут')
     written_phone = PhoneNumberField(verbose_name='Ваш телефон')
+    written_email = models.EmailField(max_length=254, verbose_name='Ваш адрес электронной почты', null=True)
     written_cover_letter = models.TextField(blank=True, verbose_name='Сопроводительное письмо')
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='applications')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
